@@ -26,20 +26,24 @@ def clean_data(df):
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
     return df
 if uploaded_file is not None:
-    if uploaded_file.name.endswith(".csv"):
+    file_name = uploaded_file.name.lower()
+
+    if file_name.endswith(".csv"):
         df = pd.read_csv(uploaded_file)
 
-    elif uploaded_file.name.endswith(".xlsx"):
+    elif file_name.endswith(".xlsx"):
         try:
-            df = pd.read_excel(uploaded_file)
+            df = pd.read_excel(uploaded_file, engine="openpyxl")
         except ImportError:
-            st.error("Excel support not installed. Please upload CSV.")
+            st.warning("Excel not supported on this deployment. Convert to CSV.")
+            st.stop()
+        except Exception as e:
+            st.error(f"Error reading Excel file: {e}")
             st.stop()
 
     else:
-        st.error("Unsupported file format")
+        st.error("Unsupported file format. Use CSV or Excel.")
         st.stop()
-
 
     st.subheader("Original Data")
     st.dataframe(df.head())
