@@ -25,12 +25,21 @@ def clean_data(df):
 
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
     return df
-
 if uploaded_file is not None:
     if uploaded_file.name.endswith(".csv"):
         df = pd.read_csv(uploaded_file)
+
+    elif uploaded_file.name.endswith(".xlsx"):
+        try:
+            df = pd.read_excel(uploaded_file)
+        except ImportError:
+            st.error("Excel support not installed. Please upload CSV.")
+            st.stop()
+
     else:
-        df = pd.read_excel(uploaded_file)
+        st.error("Unsupported file format")
+        st.stop()
+
 
     st.subheader("Original Data")
     st.dataframe(df.head())
