@@ -12,19 +12,20 @@ import pandas as pd
 st.title("Smart Dataset Cleaner")
 
 uploaded_file = st.file_uploader("Upload CSV or Excel", type=["csv", "xlsx"])
-
 def clean_data(df):
     df = df.drop_duplicates()
 
     for col in df.select_dtypes(include=["float64", "int64"]).columns:
-        df[col].fillna(df[col].mean(), inplace=True)
+        df[col] = df[col].fillna(df[col].mean())
 
     for col in df.select_dtypes(include=["object"]).columns:
-        if not df[col].mode().empty:
-            df[col].fillna(df[col].mode()[0], inplace=True)
+        if col != "name" and not df[col].mode().empty:
+            df[col] = df[col].fillna(df[col].mode()[0])
 
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+
     return df
+
 if uploaded_file is not None:
     file_name = uploaded_file.name.lower()
 
